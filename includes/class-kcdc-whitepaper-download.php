@@ -122,7 +122,20 @@ class Kcdc_Whitepaper_Download {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-kcdc-whitepaper-download-public.php';
 
+
+
 		$this->loader = new Kcdc_Whitepaper_Download_Loader();
+
+		#custom includes 
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-kcdc-whitepaper-download-admin-pages.php';
+
+		$admin_pages = new KCDC_Whitepaper_Download_Admin_Pages($this->get_plugin_name(), $this->get_version(), $this->loader);
+		//  print_r($admin_pages);
+
+
+
+
 
 	}
 

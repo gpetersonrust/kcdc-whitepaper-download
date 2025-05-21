@@ -33,7 +33,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        brand:  talwindGlobals.colors,
+        brand: {
+          "primary": "#c3172f",
+          "secondary": "#005795",
+          "text-dark": "#1a1a1a",
+        }
       },
       borderRadius: {
        

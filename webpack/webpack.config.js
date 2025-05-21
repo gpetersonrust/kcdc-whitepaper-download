@@ -12,6 +12,7 @@ module.exports = {
   entry: {
     app: path.resolve(__dirname, 'src', 'app', 'js', 'app.js'),
     ['kcdc-download']: path.resolve(__dirname, 'src', 'app', 'js', 'app.js'),
+    ['kcdc-download-admin']: path.resolve(__dirname, 'src', 'admin', 'js', 'admin.js'),
   },
   output: {
     publicPath: '/',
