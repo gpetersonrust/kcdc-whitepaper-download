@@ -41,6 +41,24 @@ class Kcdc_Whitepaper_Download_Public {
 	private $version;
 
 	/**
+	 * The hash for the plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $hash    The hash for the plugin.
+	 */
+	private $hash;
+
+	/**
+	 * The URL to the plugin directory.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $plugin_url    The URL to the plugin directory.
+	 */
+	private $plugin_url;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0

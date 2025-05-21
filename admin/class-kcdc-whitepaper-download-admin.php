@@ -24,7 +24,7 @@
  */
 
 class  Kcdc_Whitepaper_Download_Admin  {
-    protected $loader;
+ 
     private $plugin_name;
     private $version;
     private $hash;
@@ -33,7 +33,7 @@ class  Kcdc_Whitepaper_Download_Admin  {
     public function __construct($plugin_name, $version) {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
-        $this->loader = $loader;
+       
         $this->hash = $this->dynamic_hash();
         $this->plugin_url = KCDC_WHITEPAPER_DOWNLOAD_URL;
 

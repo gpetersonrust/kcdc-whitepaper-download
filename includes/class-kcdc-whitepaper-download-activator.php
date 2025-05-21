@@ -1,4 +1,5 @@
 <?php
+require_once KCDC_WHITEPAPER_DOWNLOAD_DIR . 'includes/class-kcdc-whitepaper-db.php';
 
 /**
  * Fired during plugin activation
@@ -23,14 +24,14 @@
 class Kcdc_Whitepaper_Download_Activator {
 
 	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
+	 * Runs during plugin activation.
 	 *
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-
+			// Instantiate and create tables
+		$db = new Kcdc_Whitepaper_DB();
+		$db->create_tables();
+		
 	}
-
 }

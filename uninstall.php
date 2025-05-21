@@ -29,3 +29,20 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+
+// If uninstall not called from WordPress, exit.
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+	exit;
+}
+
+// Optional: Check for specific user capability if desired.
+if ( ! current_user_can( 'activate_plugins' ) ) {
+	return;
+}
+
+// Load the plugin's DB handler.
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-kcdc-whitepaper-db.php';
+
+// Drop custom tables.
+$db = new Kcdc_Whitepaper_DB();
+$db->drop_tables();

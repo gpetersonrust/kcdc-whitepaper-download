@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       KCDC Whitepaper Download
  * Plugin URI:        https://kcdc.org
- * Description:       This is a description of the plugin.
+ * Description:       Provides a secure, token-based system to gate whitepaper downloads behind a form. Includes custom database storage, rate-limiting with IP blocking, one-time-use download links, admin-configurable email notifications, and a backend interface to manage submissions and settings.
  * Version:           1.0.0
  * Author:            Gino Peterson
  * Author URI:        https://moxcar.com/
@@ -69,6 +69,10 @@ register_deactivation_hook( __FILE__, 'deactivate_kcdc_whitepaper_download' );
  * admin-specific hooks, and public-facing site hooks.
  */
 require plugin_dir_path( __FILE__ ) . 'includes/class-kcdc-whitepaper-download.php';
+
+// Include the DB class if not autoloaded
+
+	
 
 /**
  * Begins execution of the plugin.
