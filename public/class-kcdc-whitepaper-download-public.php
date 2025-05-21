@@ -51,6 +51,12 @@ class Kcdc_Whitepaper_Download_Public {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+		$this->hash = $this->dynamic_hash();
+
+		 
+		$this->plugin_url = KCDC_WHITEPAPER_DOWNLOAD_URL;
+
+
 
 	}
 
@@ -60,20 +66,13 @@ class Kcdc_Whitepaper_Download_Public {
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Kcdc_Whitepaper_Download_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Kcdc_Whitepaper_Download_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/kcdc-whitepaper-download-public.css', array(), $this->version, 'all' );
+	wp_enqueue_style(
+		$this->plugin_name,
+		$this->plugin_url . 'dist/kcdc-download/kcdc-download' . $this->hash . '.css',
+		array(),
+		$this->version,
+		'all'
+	);
 
 	}
 
@@ -84,20 +83,49 @@ class Kcdc_Whitepaper_Download_Public {
 	 */
 	public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Kcdc_Whitepaper_Download_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Kcdc_Whitepaper_Download_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+		wp_enqueue_script(
+			$this->plugin_name,
+			$this->plugin_url . 'dist/kcdc-download/kcdc-download' . $this->hash . '.js',
+			array(),
+			$this->version,
+			true
+		);
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/kcdc-whitepaper-download-public.js', array( 'jquery' ), $this->version, false );
+	}
 
+	/**
+	 * Adds defer and async attributes to the plugin's enqueued script.
+	 *
+	 * @since    1.0.0
+	 * @param    string $tag    The <script> tag for the enqueued script.
+	 * @param    string $handle The script's registered handle.
+	 * @param    string $src    The script's source URL.
+	 * @return   string Modified script tag with defer and/or async.
+	 */
+	public function add_defer_async_attributes( $tag, $handle, $src ) {
+		if ( $handle === $this->plugin_name ) {
+			// You can choose 'defer', 'async', or both
+			return str_replace( '<script ', '<script defer async ', $tag );
+		}
+		return $tag;
+	}
+
+
+	function dynamic_hash() {
+		$directory_path = plugin_dir_path(dirname(__FILE__, 1)) . 'dist/app/';
+		$files = scandir($directory_path);
+		$first_file = '';
+		foreach ($files as $file) {
+			if (!is_dir($directory_path . $file)) {
+				$first_file = $file;
+				break;
+			}
+		}
+		$hash_parts = explode('-wp', $first_file);
+		$hash = isset($hash_parts[1]) ? $hash_parts[1] : '';
+		$hash_parts = explode('.', $hash);
+		$hash = isset($hash_parts[0]) ? $hash_parts[0] : '';
+		return '-wp' . $hash;
 	}
 
 }

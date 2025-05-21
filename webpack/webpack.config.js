@@ -11,7 +11,7 @@ module.exports = {
   mode: MODE,
   entry: {
     app: path.resolve(__dirname, 'src', 'app', 'js', 'app.js'),
-    ['relationships-builders']: path.resolve(__dirname, 'src', 'app', 'js', 'app.js'),
+    ['kcdc-download']: path.resolve(__dirname, 'src', 'app', 'js', 'app.js'),
   },
   output: {
     publicPath: '/',

@@ -38,6 +38,12 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'KCDC_WHITEPAPER_DOWNLOAD_VERSION', '1.0.0' );
 
 /**
+ * Define plugin directory and URL constants
+ */
+define('KCDC_WHITEPAPER_DOWNLOAD_DIR', plugin_dir_path(__FILE__));
+define('KCDC_WHITEPAPER_DOWNLOAD_URL', plugin_dir_url(__FILE__));
+
+/**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-kcdc-whitepaper-download-activator.php
  */
