@@ -437,3 +437,4 @@ class Kcdc_Whitepaper_DB {
         return $success;
     }
 }
+?>

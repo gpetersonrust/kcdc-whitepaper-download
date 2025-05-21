@@ -45,3 +45,4 @@ class Kcdc_Whitepaper_Download_i18n {
 
 
 }
+?>

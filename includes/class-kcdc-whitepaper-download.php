@@ -133,6 +133,22 @@ class Kcdc_Whitepaper_Download {
 		$admin_pages = new KCDC_Whitepaper_Download_Admin_Pages($this->get_plugin_name(), $this->get_version(), $this->loader);
 		//  print_r($admin_pages);
 
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-kcdc-whitepaper-download-form-handler.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-kcdc-whitepaper-db.php';
+
+		$db = new Kcdc_Whitepaper_DB();
+		$form_handler = new Kcdc_Whitepaper_Form_Handler($db);
+		$form_handler->register($this->loader);
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-kcdc-whitepaper-download-shortcode.php';
+
+		$shortcode = new Kcdc_Whitepaper_Shortcode($this->get_plugin_name(), $this->get_version(), $this->loader);
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-kcdc-whitepaper-download-router.php';
+
+		$router = new Kcdc_Whitepaper_Download_Router();
+		$router->register($this->loader);
+ 
 
 
 
@@ -230,3 +246,4 @@ class Kcdc_Whitepaper_Download {
 	}
 
 }
+?>

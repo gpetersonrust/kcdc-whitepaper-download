@@ -102,3 +102,4 @@ class KCDC_Whitepaper_Download_Admin_Pages {
     }
  
 }
+?>

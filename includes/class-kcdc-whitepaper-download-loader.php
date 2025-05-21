@@ -127,3 +127,4 @@ class Kcdc_Whitepaper_Download_Loader {
 	}
 
 }
+?>

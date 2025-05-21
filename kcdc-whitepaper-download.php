@@ -90,3 +90,4 @@ function run_kcdc_whitepaper_download() {
 
 }
 run_kcdc_whitepaper_download();
+?>
