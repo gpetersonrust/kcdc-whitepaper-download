@@ -15,6 +15,7 @@
 
    public function register() {
     add_shortcode('kcdc-whitepaper-form', [$this, 'render_shortcode']);
+    add_shortcode('kcdc_whitepaper_download', [$this, 'render_download_shortcode']);
 }
 
     /**
@@ -37,5 +38,18 @@
 
         include KCDC_WHITEPAPER_DOWNLOAD_DIR . 'views/public/form.php';
     }
+
+
+    /**
+     * Renders the download page by loading the download view file.
+     *
+     * @return string The download page HTML output.
+     */
+    public function render_download_shortcode() {
+        ob_start();
+        include KCDC_WHITEPAPER_DOWNLOAD_DIR . 'views/public/download_page.php';
+        return ob_get_clean();  
+    }
 }
+
 ?>

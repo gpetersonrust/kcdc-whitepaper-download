@@ -37,10 +37,10 @@ class Kcdc_Whitepaper_Download_Activator {
 			'post_type'     => 'page'
 		);
 
-		if (!get_page_by_title('White Paper Download')) {
-			wp_insert_post($my_post);
-		}
-		
+	 
+		wp_insert_post($my_post);
+	 
+ 
 	$db = new Kcdc_Whitepaper_DB();
 	$db->create_tables();
 

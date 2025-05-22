@@ -153,11 +153,7 @@ class Kcdc_Whitepaper_Download {
 
 	} 
 
-
-	public function kcdc_register_download_endpoint() {
-	add_rewrite_rule('^kcdc/download/?$', 'index.php?kcdc_download=1', 'top');
-	add_rewrite_tag('%kcdc_download%', '1');
-}
+ 
 
 	/**
 	 * Define the locale for this plugin for internationalization.

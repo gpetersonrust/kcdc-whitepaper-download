@@ -60,8 +60,13 @@ class Kcdc_Whitepaper_Form_Handler {
             $this->redirect_with_error('db-error');
         }
 
-        $download_url = add_query_arg('token', $token, home_url('/download'));
+         $site_url = get_site_url();
+        $slug = "white-paper-download";
+         
+        $download_url = $site_url . '/' . $slug . '/?token=' . $token;
 
+     
+        
         // Email user
         $user_email_subject = __('Your KCDC Whitepaper Download Link', 'kcdc-whitepaper-download');
         $user_email_body = $this->render_template('user-email.php', [

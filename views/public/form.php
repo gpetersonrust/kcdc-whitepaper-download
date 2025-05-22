@@ -8,14 +8,13 @@ $token = isset($_GET['token']) ? sanitize_text_field($_GET['token']) : '';
         <h2 class="kcdc-confirmation__heading"><?php esc_html_e('Thank you for your request!', 'kcdc-whitepaper-download'); ?></h2>
         <p class="kcdc-confirmation__message"><?php esc_html_e('Your download link is ready.', 'kcdc-whitepaper-download'); ?></p>
 
-        <form method="POST" action="<?php echo esc_url(home_url('/white-paper/download')); ?>">
-            <input type="hidden" name="action" value="kcdc_download_whitepaper">
-            <input type="hidden" name="kcdc_nonce" value="<?php echo esc_attr(wp_create_nonce('kcdc_download_nonce')); ?>">
-            <input type="hidden" name="token" value="<?php echo esc_attr($token); ?>">
-            <button type="submit" class="kcdc-confirmation__download-button">
-                <?php esc_html_e('Download Whitepaper', 'kcdc-whitepaper-download'); ?>
-            </button>
-        </form>
+        <a href="<?php echo esc_url(add_query_arg([
+            'action' => 'kcdc_download_whitepaper',
+            
+            'token' => $token
+        ], home_url('/white-paper-download'))); ?>" class="kcdc-confirmation__download-button">
+            <?php esc_html_e('Download Whitepaper', 'kcdc-whitepaper-download'); ?>
+        </a>
     </div>
 
 <?php else: ?>
