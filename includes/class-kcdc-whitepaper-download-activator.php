@@ -29,24 +29,22 @@ class Kcdc_Whitepaper_Download_Activator {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-		// Create custom database tables
-		$db = new Kcdc_Whitepaper_DB();
-		$db->create_tables();
 
-		// Ensure custom rewrite rule is added immediately
-		self::register_download_endpoint();
+		$my_post = array(
+			'post_title'    => 'White Paper Download',
+			'post_content'  => '[kcdc_whitepaper_download]',
+			'post_status'   => 'publish',
+			'post_type'     => 'page'
+		);
 
-		// Flush rewrite rules to make new endpoint available immediately
-		flush_rewrite_rules();
-	}
+		if (!get_page_by_title('White Paper Download')) {
+			wp_insert_post($my_post);
+		}
+		
+	$db = new Kcdc_Whitepaper_DB();
+	$db->create_tables();
 
-	/**
-	 * Register custom download endpoint for the whitepaper token handler.
-	 * This must run on 'init' in the main plugin, and once on activation.
-	 */
-	public static function register_download_endpoint() {
-		add_rewrite_rule('^kcdc/download/?$', 'index.php?kcdc_download=1', 'top');
-		add_rewrite_tag('%kcdc_download%', '1');
-	}
+ 
+}
 }
 ?>

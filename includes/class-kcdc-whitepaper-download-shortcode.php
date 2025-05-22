@@ -1,4 +1,4 @@
- <?php
+<?php
 
  class Kcdc_Whitepaper_Shortcode {
     private $plugin_name;

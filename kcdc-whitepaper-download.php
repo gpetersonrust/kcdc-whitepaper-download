@@ -69,8 +69,7 @@ register_deactivation_hook( __FILE__, 'deactivate_kcdc_whitepaper_download' );
  * admin-specific hooks, and public-facing site hooks.
  */
 require plugin_dir_path( __FILE__ ) . 'includes/class-kcdc-whitepaper-download.php';
-
-// Include the DB class if not autoloaded
+ 
 
 	
 

@@ -125,13 +125,14 @@ class Kcdc_Whitepaper_Download {
 
 
 		$this->loader = new Kcdc_Whitepaper_Download_Loader();
+		// $this->loader->add_action('init', $this, 'kcdc_register_download_endpoint');
 
 		#custom includes 
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-kcdc-whitepaper-download-admin-pages.php';
 
 		$admin_pages = new KCDC_Whitepaper_Download_Admin_Pages($this->get_plugin_name(), $this->get_version(), $this->loader);
-		//  print_r($admin_pages);
+ 
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-kcdc-whitepaper-download-form-handler.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-kcdc-whitepaper-db.php';
@@ -144,16 +145,19 @@ class Kcdc_Whitepaper_Download {
 
 		$shortcode = new Kcdc_Whitepaper_Shortcode($this->get_plugin_name(), $this->get_version(), $this->loader);
 
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-kcdc-whitepaper-download-router.php';
-
-		$router = new Kcdc_Whitepaper_Download_Router();
-		$router->register($this->loader);
+		 
  
 
+	
 
 
+	} 
 
-	}
+
+	public function kcdc_register_download_endpoint() {
+	add_rewrite_rule('^kcdc/download/?$', 'index.php?kcdc_download=1', 'top');
+	add_rewrite_tag('%kcdc_download%', '1');
+}
 
 	/**
 	 * Define the locale for this plugin for internationalization.

@@ -51,20 +51,28 @@ class Kcdc_Whitepaper_DB {
      * It uses `dbDelta()` for safe table creation and updates.
      */
     public function create_tables() {
-        // Ensure the upgrade.php file is loaded for dbDelta() function.
-        if ( ! function_exists( 'dbDelta' ) ) {
-            require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-        }
+    global $wpdb;
 
-        // SQL to create the requests table.
-        // `id`: Unique identifier for each request (auto-incremented, unsigned).
-        // `name`: Name of the requestor (VARCHAR 255, NOT NULL).
-        // `agency`: Agency of the requestor (VARCHAR 255, NOT NULL).
-        // `email`: Email of the requestor (VARCHAR 255, NOT NULL, should be unique if possible).
-        // `token`: Unique token for whitepaper access (VARCHAR 64, NOT NULL).
-        // `used`: Flag to check if the token has been used (TINYINT(1), default 0).
-        // `created_at`: Timestamp of when the request was made (DATETIME, default CURRENT_TIMESTAMP).
-        // `used_at`: Timestamp of when the token was used (DATETIME, default NULL).
+    if ( ! function_exists( 'dbDelta' ) ) {
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    }
+
+    // Check if the requests table already exists
+    $table_check_1 = $wpdb->get_var( $wpdb->prepare(
+        "SHOW TABLES LIKE %s",
+        $wpdb->esc_like( $this->request_table )
+    ));
+
+    // Check if the blocked IPs table already exists
+    $table_check_2 = $wpdb->get_var( $wpdb->prepare(
+        "SHOW TABLES LIKE %s",
+        $wpdb->esc_like( $this->blocked_ip_table )
+    ));
+
+    ob_start(); // Suppress potential dbDelta output
+
+    // Create requests table if it doesn't exist
+    if ( $table_check_1 !== $this->request_table ) {
         $sql_requests = "CREATE TABLE {$this->request_table} (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
@@ -74,30 +82,29 @@ class Kcdc_Whitepaper_DB {
             used TINYINT(1) DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             used_at DATETIME DEFAULT NULL,
-            KEY `token_idx` (`token`), -- Add index for faster token lookups.
-            UNIQUE KEY `email_token_unique` (`email`, `token`) -- Prevent duplicate email/token pairs.
+            KEY token_idx (token),
+            UNIQUE KEY email_token_unique (email, token)
         ) {$this->charset_collate};";
 
-        // SQL to create the blocked IPs table.
-        // `id`: Unique identifier for each blocked IP (auto-incremented, unsigned).
-        // `ip_address`: The blocked IP address (VARCHAR 45 for IPv4 and IPv6, NOT NULL).
-        // `user_agent`: User agent string of the blocked request (TEXT, nullable).
-        // `block_reason`: Reason for blocking the IP (TEXT, nullable).
-        // `created_at`: Timestamp of when the IP was blocked (DATETIME, default CURRENT_TIMESTAMP).
+        dbDelta($sql_requests);
+    }
+
+    // Create blocked IPs table if it doesn't exist
+    if ( $table_check_2 !== $this->blocked_ip_table ) {
         $sql_blocked_ips = "CREATE TABLE {$this->blocked_ip_table} (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             ip_address VARCHAR(45) NOT NULL,
             user_agent TEXT,
             block_reason TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE KEY `ip_address_unique` (`ip_address`) -- Ensure only one entry per IP.
+            UNIQUE KEY ip_address_unique (ip_address)
         ) {$this->charset_collate};";
 
-        // `dbDelta` checks the current table structure and modifies it if necessary.
-        // This is safer than direct CREATE TABLE for updates.
-        dbDelta( $sql_requests );
-        dbDelta( $sql_blocked_ips );
+        dbDelta($sql_blocked_ips);
     }
+
+    ob_end_clean(); // Clear any unexpected output
+}
 
     /**
      * Inserts a new whitepaper request into the database.
