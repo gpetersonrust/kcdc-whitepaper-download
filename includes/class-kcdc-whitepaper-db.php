@@ -75,6 +75,8 @@ class Kcdc_Whitepaper_DB {
     if ( $table_check_1 !== $this->request_table ) {
         $sql_requests = "CREATE TABLE {$this->request_table} (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            post_id BIGINT UNSIGNED NOT NULL,
+            wp_nonce VARCHAR(64) NOT NULL,
             name VARCHAR(255) NOT NULL,
             agency VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL,
@@ -120,6 +122,8 @@ class Kcdc_Whitepaper_DB {
         // Sanitize all user-provided data before insertion to prevent XSS and other attacks.
         $sanitized_data = array(
             'name'       => sanitize_text_field( $data['name'] ),
+            'post_id'    => absint( $data['post_id'] ), // Ensure post ID is an integer.
+            'wp_nonce'   => sanitize_text_field( $data['wp_nonce'] ),
             'agency'     => sanitize_text_field( $data['agency'] ),
             'email'      => sanitize_email( $data['email'] ),
             'token'      => sanitize_key( $data['token'] ), // Sanitize token as a key/slug.
@@ -131,7 +135,9 @@ class Kcdc_Whitepaper_DB {
         // '%s' for strings, '%d' for integers, '%f' for floats.
         $data_format = array(
             '%s', // name
-            '%s', // agency
+            '%d', // post_id
+            '%s', // wp_nonce
+            '%s', // agency 
             '%s', // email
             '%s', // token
             '%d', // used
@@ -442,6 +448,28 @@ class Kcdc_Whitepaper_DB {
         }
 
         return $success;
+    }
+
+
+    /**
+     * Retrieves all whitepaper requests for a specific post ID.
+     *
+     * @param int $post_id The post ID to search for.
+     * @return array Array of request objects, empty array if none found.
+     */
+    public function get_requests_by_post_id($post_id) {
+        global $wpdb;
+
+        $post_id = absint($post_id);
+
+        $query = $wpdb->prepare(
+            "SELECT * FROM {$this->request_table} WHERE post_id = %d ORDER BY created_at DESC",
+            $post_id
+        );
+
+        $results = $wpdb->get_results($query);
+
+        return is_array($results) ? $results : array();
     }
 }
 ?>

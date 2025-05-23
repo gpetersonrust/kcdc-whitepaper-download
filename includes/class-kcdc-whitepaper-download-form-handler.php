@@ -27,9 +27,20 @@ class Kcdc_Whitepaper_Form_Handler {
         $name   = sanitize_text_field($_POST['kcdc_name'] ?? '');
         $agency = sanitize_text_field($_POST['kcdc_agency'] ?? '');
         $email  = sanitize_email($_POST['kcdc_email'] ?? '');
+        $post_id = intval($_POST['kcdc_post_id'] ?? 0);     
+        $post_url = sanitize_url($_POST['kcdc_post_url'] ?? '');
 
-        if (empty($name) || empty($agency) || empty($email)) {
-            $this->redirect_with_error('missing-fields');
+  
+        if (empty($name) || empty($agency) || empty($email) || empty($post_id)) {
+            $errors = [];
+            if (empty($name)) $errors[] = 'name';
+            if (empty($agency)) $errors[] = 'agency';
+            if (empty($email)) $errors[] = 'email';
+            if (empty($post_id)) $errors[] = 'post_id';
+            
+            if (!empty($errors)) {
+                $this->redirect_with_error('missing-fields-' . implode(',', $errors));
+            }
         }
 
         $user_ip = Kcdc_Whitepaper_Helper::get_user_ip();
@@ -50,6 +61,7 @@ class Kcdc_Whitepaper_Form_Handler {
 
         $result = $this->db->insert_request([
             'name'   => $name,
+            'post_id' => $post_id,
             'agency' => $agency,
             'email'  => $email,
             'token'  => $token,
@@ -60,10 +72,7 @@ class Kcdc_Whitepaper_Form_Handler {
             $this->redirect_with_error('db-error');
         }
 
-         $site_url = get_site_url();
-        $slug = "white-paper-download";
-         
-        $download_url = $site_url . '/' . $slug . '/?token=' . $token;
+        $download_url = $post_url . '?token=' . $token;
 
      
         
@@ -74,24 +83,26 @@ class Kcdc_Whitepaper_Form_Handler {
             'download_url' => $download_url,
         ]);
 
-        wp_mail($email, $user_email_subject, $user_email_body, ['Content-Type: text/html; charset=UTF-8']);
+    //    $mail =   wp_mail($email, $user_email_subject, $user_email_body, ['Content-Type: text/html; charset=UTF-8']);
 
-        // Email admin(s)
-        $admin_emails = get_option('kcdc_admin_emails');
-        if ($admin_emails) {
-            $recipients = array_filter(array_map('sanitize_email', explode(',', $admin_emails)));
-            if (!empty($recipients)) {
-                $admin_subject = __('New Whitepaper Request Submitted', 'kcdc-whitepaper-download');
-                $admin_body = $this->render_template('admin-email.php', [
-                    'name' => $name,
-                    'agency' => $agency,
-                    'email' => $email,
-                ]);
-                wp_mail($recipients, $admin_subject, $admin_body, ['Content-Type: text/html; charset=UTF-8']);
-            }
-        }
+    //    print_r($mail);
 
-        wp_safe_redirect(home_url('/kcdc/white-paper-form/?success=true&token=' . urlencode($token)));
+    //     // Email admin(s)
+    //     $admin_emails = get_option('kcdc_admin_emails');
+    //     if ($admin_emails) {
+    //         $recipients = array_filter(array_map('sanitize_email', explode(',', $admin_emails)));
+    //         if (!empty($recipients)) {
+    //             $admin_subject = __('New Whitepaper Request Submitted', 'kcdc-whitepaper-download');
+    //             $admin_body = $this->render_template('admin-email.php', [
+    //                 'name' => $name,
+    //                 'agency' => $agency,
+    //                 'email' => $email,
+    //             ]);
+    //             wp_mail($recipients, $admin_subject, $admin_body, ['Content-Type: text/html; charset=UTF-8']);
+    //         }
+    //     }
+
+        wp_safe_redirect($post_url . '?success=true&token=' . urlencode($token) . '&post_id=' . urlencode($post_id));
         exit;
     }
 

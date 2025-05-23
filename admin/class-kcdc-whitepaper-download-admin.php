@@ -40,7 +40,16 @@ class  Kcdc_Whitepaper_Download_Admin  {
    
     }
 
- 
+      public function register_hooks() {
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
+    }
+
+
+  public function enqueue_admin_assets($hook) {
+        wp_enqueue_media();
+        $this->enqueue_styles();
+        $this->enqueue_scripts();
+    }
 
     public function enqueue_styles() {
         wp_enqueue_style(
@@ -59,6 +68,14 @@ class  Kcdc_Whitepaper_Download_Admin  {
             array(),
             $this->version,
             true
+        );
+
+        wp_localize_script(
+            $this->plugin_name . '-admin',
+            'kcdc_admin',
+            array(
+                'ajaxurl' => admin_url('admin-ajax.php')
+            )
         );
     }
 

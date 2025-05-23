@@ -30,15 +30,19 @@ class Kcdc_Whitepaper_Download_Activator {
 	 */
 	public static function activate() {
 
-		$my_post = array(
+		// Check if page already exists
+		$existing_page = get_page_by_title('White Paper Download', OBJECT, 'page');
+		
+		if (!$existing_page) {
+			$my_post = array(
 			'post_title'    => 'White Paper Download',
 			'post_content'  => '[kcdc_whitepaper_download]',
 			'post_status'   => 'publish',
 			'post_type'     => 'page'
-		);
-
-	 
-		wp_insert_post($my_post);
+			);
+			
+			wp_insert_post($my_post);
+		}
 	 
  
 	$db = new Kcdc_Whitepaper_DB();
