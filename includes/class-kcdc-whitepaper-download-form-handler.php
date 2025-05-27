@@ -12,13 +12,29 @@ class Kcdc_Whitepaper_Form_Handler {
 
     public function register($loader) {
         $this->loader = $loader;
-        $this->loader->add_action('admin_post_kcdc_submit_form', $this, 'handle'); // For logged-in users
-        $this->loader->add_action('admin_post_nopriv_kcdc_submit_form', $this, 'handle'); // For visitors
+   
 
+        $this->loader->add_action('init', $this, 'add_rewrite_rule');
+        $this->loader->add_action('template_redirect', $this, 'maybe_handle_form');
+
+    }
+
+
+      public function add_rewrite_rule() {
+        add_rewrite_rule('^kcdc-form-handler/?$', 'index.php?kcdc_form=1', 'top');
+        add_rewrite_tag('%kcdc_form%', '1');
+    }
+
+    public function maybe_handle_form() {
+        if (get_query_var('kcdc_form') == 1 && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->handle();
+            exit;
+        }
     }
 
     public function handle() {
         error_log('KCDC FORM: handler started');
+        $nonce_value = $_POST['kcdc_nonce'] ?? '';
 
         if (!isset($_POST['kcdc_nonce']) || !wp_verify_nonce($_POST['kcdc_nonce'], 'kcdc_form_nonce')) {
             $this->redirect_with_error('security');
@@ -62,6 +78,7 @@ class Kcdc_Whitepaper_Form_Handler {
         $result = $this->db->insert_request([
             'name'   => $name,
             'post_id' => $post_id,
+            'wp_nonce' => $nonce_value,
             'agency' => $agency,
             'email'  => $email,
             'token'  => $token,

@@ -4,7 +4,8 @@ get_header();
 $success = isset($_GET['success']) && $_GET['success'] === 'true';
 $token = isset($_GET['token']) ? sanitize_text_field($_GET['token']) : '';
 $post_id = isset($_GET['post_id']) ? intval($_GET['post_id']) :  get_the_ID();
-$form_action = esc_url(admin_url('admin-post.php'));
+$form_action = esc_url(home_url('/kcdc-form-handler'));
+
 // 🛠️ Create the nonce
 $nonce = wp_create_nonce('kcdc_form_nonce');
 
