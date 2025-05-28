@@ -9,7 +9,7 @@ class Kcdc_Whitepaper_Post_Type {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
         $this->loader = $loader;
-        $this->loader->add_action('init', $this, 'register');
+        $this->loader->add_action('init', $this, 'register', 5);
         $this->loader->add_filter('single_template', $this, 'get_custom_post_type_template');
         $this->loader->add_action('add_meta_boxes', $this, 'add_documents_meta_box');
         $this->loader->add_action('save_post', $this, 'save_documents_meta_box');
@@ -17,17 +17,17 @@ class Kcdc_Whitepaper_Post_Type {
 
     public function register() {
         $labels = array(
-            'name'                  => _x('Whitepapers', 'Post type general name', 'kcdc-whitepaper-download'),
-            'singular_name'         => _x('Whitepaper', 'Post type singular name', 'kcdc-whitepaper-download'),
-            'menu_name'            => _x('Whitepapers', 'Admin Menu text', 'kcdc-whitepaper-download'),
+            'name'                  => _x('White Papers', 'Post type general name', 'kcdc-whitepaper-download'),
+            'singular_name'         => _x('White Paper', 'Post type singular name', 'kcdc-whitepaper-download'),
+            'menu_name'            => _x('White Papers', 'Admin Menu text', 'kcdc-whitepaper-download'),
             'add_new'              => __('Add New', 'kcdc-whitepaper-download'),
-            'add_new_item'         => __('Add New Whitepaper', 'kcdc-whitepaper-download'),
-            'edit_item'            => __('Edit Whitepaper', 'kcdc-whitepaper-download'),
-            'new_item'             => __('New Whitepaper', 'kcdc-whitepaper-download'),
-            'view_item'            => __('View Whitepaper', 'kcdc-whitepaper-download'),
-            'search_items'         => __('Search Whitepapers', 'kcdc-whitepaper-download'),
-            'not_found'            => __('No whitepapers found', 'kcdc-whitepaper-download'),
-            'not_found_in_trash'   => __('No whitepapers found in Trash', 'kcdc-whitepaper-download'),
+            'add_new_item'         => __('Add New White Paper', 'kcdc-whitepaper-download'),
+            'edit_item'            => __('Edit White Paper', 'kcdc-whitepaper-download'),
+            'new_item'             => __('New White Paper', 'kcdc-whitepaper-download'),
+            'view_item'            => __('View White Paper', 'kcdc-whitepaper-download'),
+            'search_items'         => __('Search White Papers', 'kcdc-whitepaper-download'),
+            'not_found'            => __('No white papers found', 'kcdc-whitepaper-download'),
+            'not_found_in_trash'   => __('No white papers found in Trash', 'kcdc-whitepaper-download'),
         );
 
         $args = array(
@@ -37,7 +37,7 @@ class Kcdc_Whitepaper_Post_Type {
             'show_ui'             => true,
             'show_in_menu'        => true,
             'query_var'           => true,
-            'rewrite'             => array('slug' => 'whitepaper'),
+            'rewrite'             => array('slug' => 'resources'),
             'capability_type'     => 'post',
             'has_archive'         => true,
             'hierarchical'        => false,

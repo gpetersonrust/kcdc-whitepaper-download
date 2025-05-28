@@ -32,96 +32,83 @@ class Kcdc_Whitepaper_Form_Handler {
         }
     }
 
-    public function handle() {
-        error_log('KCDC FORM: handler started');
-        $nonce_value = $_POST['kcdc_nonce'] ?? '';
+   public function handle() {
+    error_log('KCDC FORM: handler started');
+    $nonce_value = $_POST['kcdc_nonce'] ?? '';
 
-        if (!isset($_POST['kcdc_nonce']) || !wp_verify_nonce($_POST['kcdc_nonce'], 'kcdc_form_nonce')) {
-            $this->redirect_with_error('security');
+    if (!isset($_POST['kcdc_nonce']) || !wp_verify_nonce($_POST['kcdc_nonce'], 'kcdc_form_nonce')) {
+        $this->redirect_with_error('security');
+    }
+
+    // Get and sanitize First Name and Last Name
+    $first_name = sanitize_text_field($_POST['kcdc_first_name'] ?? '');
+    $last_name  = sanitize_text_field($_POST['kcdc_last_name'] ?? '');
+    
+    // Combine first and last name
+    $name = trim($first_name . ' ' . $last_name); // trim ensures no leading/trailing spaces if one is empty
+
+    $agency   = sanitize_text_field($_POST['kcdc_agency'] ?? '');
+    $email    = sanitize_email($_POST['kcdc_email'] ?? '');
+    $post_id  = intval($_POST['kcdc_post_id'] ?? 0);     
+    $post_url = sanitize_url($_POST['kcdc_post_url'] ?? '');
+
+    // Updated validation for first_name and last_name
+    if (empty($first_name) || empty($last_name) || empty($agency) || empty($email) || empty($post_id)) {
+        $errors = [];
+        if (empty($first_name)) $errors[] = 'first_name'; // Updated
+        if (empty($last_name))  $errors[] = 'last_name';  // Updated
+        if (empty($agency))     $errors[] = 'agency';
+        if (empty($email))      $errors[] = 'email';
+        if (empty($post_id))    $errors[] = 'post_id';
+        
+        if (!empty($errors)) {
+            // The error string now includes specific missing fields
+            $this->redirect_with_error('missing-fields-' . implode(',', $errors));
         }
+    }
 
-        $name   = sanitize_text_field($_POST['kcdc_name'] ?? '');
-        $agency = sanitize_text_field($_POST['kcdc_agency'] ?? '');
-        $email  = sanitize_email($_POST['kcdc_email'] ?? '');
-        $post_id = intval($_POST['kcdc_post_id'] ?? 0);     
-        $post_url = sanitize_url($_POST['kcdc_post_url'] ?? '');
+    $user_ip = Kcdc_Whitepaper_Helper::get_user_ip();
+    if ($this->db->is_ip_blocked($user_ip)) {
+        $this->redirect_with_error('blocked-ip');
+    }
 
-  
-        if (empty($name) || empty($agency) || empty($email) || empty($post_id)) {
-            $errors = [];
-            if (empty($name)) $errors[] = 'name';
-            if (empty($agency)) $errors[] = 'agency';
-            if (empty($email)) $errors[] = 'email';
-            if (empty($post_id)) $errors[] = 'post_id';
-            
-            if (!empty($errors)) {
-                $this->redirect_with_error('missing-fields-' . implode(',', $errors));
-            }
-        }
+    // Basic rate limit: 5 submissions per 10 minutes per IP
+    $ip_key = 'kcdc_rate_' . md5($user_ip);
+    $count = get_transient('kcdc_limit_' . $ip_key) ?: 0;
+    if ($count >= 10) {
+        $this->db->insert_blocked_ip($user_ip, $_SERVER['HTTP_USER_AGENT'] ?? '', 'Rate limit exceeded');
+        $this->redirect_with_error('rate-limit');
+    }
+    set_transient('kcdc_limit_' . $ip_key, $count + 1, 60); // 60 seconds = 1 minute
 
-        $user_ip = Kcdc_Whitepaper_Helper::get_user_ip();
-        if ($this->db->is_ip_blocked($user_ip)) {
-            $this->redirect_with_error('blocked-ip');
-        }
+    $token = bin2hex(random_bytes(16));
 
-        // Basic rate limit: 5 submissions per 10 minutes per IP
-        $ip_key = 'kcdc_rate_' . md5($user_ip);
-        $count = get_transient('kcdc_limit_' . $ip_key) ?: 0;
-        if ($count >= 5) {
-            $this->db->insert_blocked_ip($user_ip, $_SERVER['HTTP_USER_AGENT'] ?? '', 'Rate limit exceeded');
-            $this->redirect_with_error('rate-limit');
-        }
-        set_transient('kcdc_limit_' . $ip_key, $count + 1, 10 * MINUTE_IN_SECONDS);
+    $result = $this->db->insert_request([
+        'name'     => $name, // This will now be "Firstname Lastname"
+        'first_name' => $first_name, // Optional: Store first name separately if your DB schema supports it
+        'last_name'  => $last_name,  // Optional: Store last name separately if your DB schema supports it
+        'post_id'  => $post_id,
+        'wp_nonce' => $nonce_value,
+        'agency'   => $agency,
+        'email'    => $email,
+        'token'    => $token,
+    ]);
 
-        $token = bin2hex(random_bytes(16));
-
-        $result = $this->db->insert_request([
-            'name'   => $name,
-            'post_id' => $post_id,
-            'wp_nonce' => $nonce_value,
-            'agency' => $agency,
-            'email'  => $email,
-            'token'  => $token,
-        ]);
-
-        if (false === $result) {
-            error_log("KCDC: Failed DB insert for $email");
-            $this->redirect_with_error('db-error');
-        }
-
-        $download_url = $post_url . '?token=' . $token;
+    if (false === $result) {
+        error_log("KCDC: Failed DB insert for $email. Name: $name, Agency: $agency, Post ID: $post_id");
+        $this->redirect_with_error('db-error');
+    }
 
      
-        
-        // Email user
-        $user_email_subject = __('Your KCDC Whitepaper Download Link', 'kcdc-whitepaper-download');
-        $user_email_body = $this->render_template('user-email.php', [
-            'name' => $name,
-            'download_url' => $download_url,
-        ]);
+ 
 
-    //    $mail =   wp_mail($email, $user_email_subject, $user_email_body, ['Content-Type: text/html; charset=UTF-8']);
+    // Redirect to the confirmation page which contains the download link
+    wp_safe_redirect($post_url . '?success=true&token=' . urlencode($token) . '&post_id=' . urlencode($post_id));
+    exit;
+}
 
-    //    print_r($mail);
 
-    //     // Email admin(s)
-    //     $admin_emails = get_option('kcdc_admin_emails');
-    //     if ($admin_emails) {
-    //         $recipients = array_filter(array_map('sanitize_email', explode(',', $admin_emails)));
-    //         if (!empty($recipients)) {
-    //             $admin_subject = __('New Whitepaper Request Submitted', 'kcdc-whitepaper-download');
-    //             $admin_body = $this->render_template('admin-email.php', [
-    //                 'name' => $name,
-    //                 'agency' => $agency,
-    //                 'email' => $email,
-    //             ]);
-    //             wp_mail($recipients, $admin_subject, $admin_body, ['Content-Type: text/html; charset=UTF-8']);
-    //         }
-    //     }
 
-        wp_safe_redirect($post_url . '?success=true&token=' . urlencode($token) . '&post_id=' . urlencode($post_id));
-        exit;
-    }
 
     private function redirect_with_error($type) {
         wp_safe_redirect(home_url('/error?reason=' . urlencode($type)));

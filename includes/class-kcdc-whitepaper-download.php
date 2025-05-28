@@ -148,6 +148,8 @@ class Kcdc_Whitepaper_Download {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-kcdc-white-paper-post-type.php';
 
 		$post_type = new Kcdc_Whitepaper_Post_Type($this->get_plugin_name(), $this->get_version(), $this->loader);
+
+		 
  
 
 	

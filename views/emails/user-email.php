@@ -20,7 +20,7 @@
                       text-decoration: none; 
                       border-radius: 4px; 
                       display: inline-block;">
-                Download Whitepaper
+                Click Here
             </a>
         </p>
         

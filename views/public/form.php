@@ -6,14 +6,14 @@ $token = isset($_GET['token']) ? sanitize_text_field($_GET['token']) : '';
 <?php if ($success && !empty($token)): ?>
     <div class="kcdc-confirmation">
         <h2 class="kcdc-confirmation__heading"><?php esc_html_e('Thank you for your request!', 'kcdc-whitepaper-download'); ?></h2>
-        <p class="kcdc-confirmation__message"><?php esc_html_e('Your download link is ready.', 'kcdc-whitepaper-download'); ?></p>
+        <p class="kcdc-confirmation__message"><?php esc_html_e('Click here to proceed to the download page.', 'kcdc-whitepaper-download'); ?></p>
 
         <a href="<?php echo esc_url(add_query_arg([
             'action' => 'kcdc_download_whitepaper',
             
             'token' => $token
         ], home_url('/white-paper-download'))); ?>" class="kcdc-confirmation__download-button">
-            <?php esc_html_e('Download Whitepaper', 'kcdc-whitepaper-download'); ?>
+            <?php esc_html_e('Click Here', 'kcdc-whitepaper-download'); ?>
         </a>
     </div>
 

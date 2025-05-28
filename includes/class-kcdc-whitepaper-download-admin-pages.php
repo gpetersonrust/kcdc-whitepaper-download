@@ -73,9 +73,9 @@ class KCDC_Whitepaper_Download_Admin_Pages {
      */
     private function init_admin_pages() {
         // Add menu items and register settings
-        $this->loader->add_action('admin_menu', $this, 'add_plugin_admin_menu');
-        $this->loader->add_action('admin_menu', $this, 'add_export_requests_entries');
-        $this->loader->add_action('wp_ajax_kcdc_export_whitepaper_csv', $this, 'handle_ajax_export_csv');
+        $this->loader->add_action('admin_menu', $this, 'add_plugin_admin_menu', 5);
+        $this->loader->add_action('admin_menu', $this, 'add_export_requests_entries', 5);
+        $this->loader->add_action('wp_ajax_kcdc_export_whitepaper_csv', $this, 'handle_ajax_export_csv', 5);
 
     }
 
@@ -86,13 +86,13 @@ class KCDC_Whitepaper_Download_Admin_Pages {
      */
     public function add_plugin_admin_menu() {
         add_menu_page(
-            'KCDC Whitepaper', // Page title
-            'KCDC Whitepaper', // Menu title
+            'White Paper Requestors', // Page title
+            'White Paper Requestors', // Menu title
             'manage_options',   // Capability required
             'kcdc-whitepaper', // Menu slug
-            array($this, 'export_requests_data'), // Callback function <-- CORRECTED: Added comma here
+            array($this, 'export_requests_data'), // Callback function
             'dashicons-download', // Icon
-            30                    // Position
+            5.1                  // Position
         );
     }
 

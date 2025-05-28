@@ -47,7 +47,7 @@ class Kcdc_Whitepaper_Download_Activator {
  
 	$db = new Kcdc_Whitepaper_DB();
 	$db->create_tables();
-
+    $db->update_requests_table_names();
  
 }
 }

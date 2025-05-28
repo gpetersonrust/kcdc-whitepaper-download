@@ -120,21 +120,29 @@ class Kcdc_Whitepaper_DB {
 
         // **Security Best Practice: Input Sanitization**
         // Sanitize all user-provided data before insertion to prevent XSS and other attacks.
+        // Sanitize first and last name
+        $first_name = sanitize_text_field($data['first_name']);
+        $last_name = sanitize_text_field($data['last_name']);
+
         $sanitized_data = array(
-            'name'       => sanitize_text_field( $data['name'] ),
-            'post_id'    => absint( $data['post_id'] ), // Ensure post ID is an integer.
-            'wp_nonce'   => sanitize_text_field( $data['wp_nonce'] ),
-            'agency'     => sanitize_text_field( $data['agency'] ),
-            'email'      => sanitize_email( $data['email'] ),
-            'token'      => sanitize_key( $data['token'] ), // Sanitize token as a key/slug.
-            'used'       => 0, // 'used' is controlled by the system, not user input.
-            'created_at' => current_time( 'mysql' ),
+            'name'       => trim($first_name . ' ' . $last_name), // Combine names
+            'first_name' => $first_name,
+            'last_name'  => $last_name,
+            'post_id'    => absint($data['post_id']),
+            'wp_nonce'   => sanitize_text_field($data['wp_nonce']),
+            'agency'     => sanitize_text_field($data['agency']),
+            'email'      => sanitize_email($data['email']),
+            'token'      => sanitize_key($data['token']),
+            'used'       => 0,
+            'created_at' => current_time('mysql'),
         );
 
         // Define the format of the data to be inserted.
         // '%s' for strings, '%d' for integers, '%f' for floats.
         $data_format = array(
             '%s', // name
+            '%s', // first_name
+            '%s', // last_name 
             '%d', // post_id
             '%s', // wp_nonce
             '%s', // agency 
@@ -470,6 +478,43 @@ class Kcdc_Whitepaper_DB {
         $results = $wpdb->get_results($query);
 
         return is_array($results) ? $results : array();
+    }
+
+
+
+    /**
+     * Updates the requests table to add first_name and last_name columns.
+     * Preserves existing data by splitting the name field into first_name and last_name.
+     */
+    public function update_requests_table_names() {
+        global $wpdb;
+
+        if (!function_exists('dbDelta')) {
+            require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        }
+
+        ob_start(); // Start output buffering
+
+        // First add the new columns
+        $wpdb->query("ALTER TABLE {$this->request_table} 
+            ADD COLUMN first_name VARCHAR(255) AFTER name,
+            ADD COLUMN last_name VARCHAR(255) AFTER first_name");
+
+        // Split existing names into first and last name
+        $wpdb->query("UPDATE {$this->request_table} 
+            SET first_name = SUBSTRING_INDEX(name, ' ', 1),
+            last_name = TRIM(SUBSTRING(name, LENGTH(SUBSTRING_INDEX(name, ' ', 1)) + 1))
+            WHERE name IS NOT NULL");
+
+        ob_end_clean(); // End and clean output buffer
+
+        // Log any errors
+        if ($wpdb->last_error) {
+            error_log('KCDC Whitepaper DB Error: Failed to update table structure. ' . $wpdb->last_error);
+            return false;
+        }
+
+        return true;
     }
 }
 ?>
